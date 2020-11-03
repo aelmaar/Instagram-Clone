@@ -56,8 +56,7 @@ function Header({ username, imageProfil }) {
 	const [imageUrl, setImageUrl] = useState(null);
 	const [progress, setProgress] = useState(0);
 	const [error, setError] = useState("");
-	const display = useRef();
-
+	const [isDisabledButton,setIsDisabledButton] = useState(true)
 	const [openMenu, setOpenMenu] = useState(false);
 	const anchorRef = useRef(null);
 
@@ -65,16 +64,8 @@ function Header({ username, imageProfil }) {
 	const classes = useStyles();
 
 	useEffect(() => {
-		const btn = display.current;
-		if (display.current !== undefined) {
-			if (caption.length > 6 && imageUrl) {
-				btn.disabled = false;
-				btn.classList.remove("Mui-disabled");
-			} else {
-				btn.disabled = true;
-				btn.classList.add("Mui-disabled");
-			}
-		}
+		if (caption.length > 6 && imageUrl) setIsDisabledButton(false) 
+		else setIsDisabledButton(true)
 	}, [caption,imageUrl]);
 
 	const handleChange = (e) => {
@@ -228,8 +219,7 @@ function Header({ username, imageProfil }) {
 							variant="contained"
 							color="primary"
 							type="submit"
-							ref={display}
-							disabled
+							disabled={isDisabledButton}
 						>
 							Upload
 						</Button>

@@ -25,7 +25,7 @@ function UploadProfileImage({
 						<AddPhotoAlternateIcon />
 					</Fab>
 				</label>
-				<button type="submit" onClick={onclick} ref={enable} disabled>
+				<button type="submit" onClick={onclick} disabled={enable}>
 					upload
 				</button>
 			</div>

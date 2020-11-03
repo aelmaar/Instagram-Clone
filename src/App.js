@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Post from "./Post";
 import Header from "./Header";
 import { storage, db, auth } from "./firebase";
@@ -18,12 +18,18 @@ function App() {
   const [open, setOpen] = useState(false);
   const [imageProfil, setImageProfil] = useState("");
   const [error, setError] = useState("");
-  const enableBtn = useRef();
+  const [isEnableBtn, setIsEnableBtn] = useState(true);
+  const [isUserPhotoExist, setIsUserPhotoExist] = useState(false);
   // here it show me wheter the user is loggin or logout (the case of the user)
   useEffect(() => {
     auth.onAuthStateChanged((authUser) => {
-      if (authUser) setUser(authUser);
-      else setUser("");
+      if (authUser) {
+        setUser(authUser);
+        setIsUserPhotoExist(true);
+      } else {
+        setUser("");
+        setIsUserPhotoExist(false);
+      }
     });
   }, [user, username]);
   // here it take a snapshot of the collection posts
@@ -83,9 +89,7 @@ function App() {
       const uploadProfil = storage.ref("profils/" + image.name).put(image);
       uploadProfil.on(
         "state_changed",
-        (snapshot) => {
-          
-        },
+        (snapshot) => {},
         (error) => {
           setError(error.message);
           setOpen(true);
@@ -100,7 +104,7 @@ function App() {
                 photoURL: url,
               });
               setImageProfil(url);
-              enableBtn.current.disabled = false;
+              setIsEnableBtn(false);
             });
         }
       );
@@ -108,8 +112,8 @@ function App() {
   };
 
   const handleClick = () => {
-    enableBtn.current.disabled = true;
-    setImageProfil('');
+    setImageProfil("");
+    setIsEnableBtn(true);
   };
 
   return (
@@ -187,7 +191,7 @@ function App() {
         </div>
       ) : (
         <div>
-          {user.photoURL ? (
+          {user?.photoURL && (
             <div>
               {/* here once the user has logged in or logged out and if the profil picture wasn't upload it
                  it show him to upload the image */}
@@ -205,7 +209,7 @@ function App() {
                 </div>
                 <div>
                   <InstagramEmbed
-                    url="https://www.instagram.com/p/CGfDyf9sHpQ/"
+                    url="https://instagr.am/p/Zw9o4/"
                     maxWidth={320}
                     hideCaption={false}
                     containerTagName="div"
@@ -216,17 +220,18 @@ function App() {
                 </div>
               </div>
             </div>
-          ) : (
-            <UploadProfileImage
-              enable={enableBtn}
-              imageProfil={imageProfil}
-              handleImageProfil={handleImageProfil}
-              onclick={handleClick}
-            />
           )}
         </div>
       )}
       {/* this is the snackbar where the error bar comes*/}
+      {!user.photoURL && isUserPhotoExist && (
+        <UploadProfileImage
+          enable={isEnableBtn}
+          imageProfil={imageProfil}
+          handleImageProfil={handleImageProfil}
+          onclick={handleClick}
+        />
+      )}
       <Snackbar
         anchorOrigin={{
           vertical: "bottom",
